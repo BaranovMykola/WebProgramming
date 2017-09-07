@@ -1,0 +1,57 @@
+@charset "utf-8";
+/* CSS Document */
+#header
+{
+	width:100%;
+	height:100px;
+	background-image: linear-gradient(0deg, #FFF, #CCC);
+	bacground-repeat:repeat-x;
+}
+#about
+{
+	width:12%;
+	float:right;
+}
+#menu
+{
+	position:absolute;
+	top:8px;
+	width:300px;
+	height:98vh;
+	background-image: linear-gradient(45deg, #FFF, #CCC);
+}
+
+.item:hover
+{
+	color:red;
+	font-size:36px;
+	padding-bottom:10%;
+	padding-top:10%;
+}
+
+.item
+{
+	padding-top:5%;
+	padding-bottom:5%;
+}
+#content
+{
+	position:absolute;
+/*	padding-left:310px;*/
+	left:310px;
+	height:85vh;
+	width:160vh;
+	background-color:#EEE;
+}
+.split
+{
+	width:400px;
+	margin-left:0px;
+}
+
+
+h1
+{
+	color:green;
+}
+
