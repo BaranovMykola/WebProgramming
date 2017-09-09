@@ -55,3 +55,20 @@ h1
 	color:green;
 }
 
+.icon 
+{
+	height:30px;
+	width:30px;
+	padding-right:10px
+}
+
+#sample
+{
+	width:155vh;
+	border:1px solid black;
+}
+
+.result
+{
+
+}
