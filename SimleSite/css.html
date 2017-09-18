@@ -55,17 +55,16 @@
 			var im = document.getElementById("css");
 					var w = im.width;
 		var h = im.height;
+				var step = im.height/im.width;
+		var scale = im.height;
+		var id2;
 	function pyrUp()
 	{
-		var stop = false;
 
-		var step = im.height/im.width;
-		var scale = im.height;
-
-						console.log(im.style.top);
+		clearInterval(id2);
 		  id = setInterval(frame, 5)
 		  function frame() {
-			if (im.width == 700 || stop == true) {
+			if (im.width == 700) {
 			  clearInterval(id);
 			} else {
 				
@@ -81,11 +80,26 @@
 	function pyrStop()
 	{
 		clearInterval(id)
+		
+				  id2 = setInterval(frame2, 5)
+		  function frame2() {
+			if (im.width == w) {
+			  clearInterval(id2);
+			} else {
+				
+				im.width-=1;
+				scale-=step;
+				im.height=scale;
+				im.style.left = 368-(im.width-w)/2+'px';
+				im.style.top = 310-(im.height-h)/2+'px';
 
-		im.style.left = 368+'px';
-		im.style.top = 310+'px';
-						im.height = h;
-		im.width = w;
+			}
+		  }
+
+	//	im.style.left = 368+'px';
+	//	im.style.top = 310+'px';
+	//					im.height = h;
+	//	im.width = w;
 
 	}
 	
