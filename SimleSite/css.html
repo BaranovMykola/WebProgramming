@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Wiki</title>
-<link rel="stylesheet" href="index.css">
+<link rel="stylesheet" href="main_style.css">
 </head>
 
 <body>
@@ -20,11 +20,12 @@
     <div class="item"><img src="home.png" class="icon"><a href="index.html">Home</a></div>
     <div class="item"><img src="img.png", class="icon"><a href ="sample.html">Samples</a></div>
 	<div class="item"><img src="css.png", class="icon"><a href="css.html">CSS</a></div>
+   	<div class="item"><img src="edit.png", class="icon"><a href="html_editor.html">Html editor</a></div>
     <hr>
     <div class="item"><img src="more.png", class="icon"><a href="https://en.wikipedia.org/wiki/HTML">More</a></div>
 </div>
     <div id="content">
-    <h1>CSS</h1>
+    <h1 class = "caption">CSS</h1>
     <hr class = "split">
     <h5><div class="code">
 	<xmp>
@@ -39,11 +40,61 @@
 </xmp>
 <hr class = "spit">
 <div id = "imageCss">
-<img src="CSS.jpg" id = "css">
+<img src="CSS.jpg" id = "css" onMouseOut="pyrStop()" onMouseOver="pyrUp()">
 </div>
 
 </h5>
     </div>
 
 </body>
+
+<script>
+	var up = 1;
+	document.getElementById("css").height = 265;
+	var id;
+			var im = document.getElementById("css");
+					var w = im.width;
+		var h = im.height;
+	function pyrUp()
+	{
+		var stop = false;
+
+		var step = im.height/im.width;
+		var scale = im.height;
+
+						console.log(im.style.top);
+		  id = setInterval(frame, 5)
+		  function frame() {
+			if (im.width == 700 || stop == true) {
+			  clearInterval(id);
+			} else {
+				
+				im.width+=1;
+				scale+=step;
+				im.height=scale;
+				im.style.left = 368-(im.width-w)/2+'px';
+				im.style.top = 310-(im.height-h)/2+'px';
+
+			}
+		  }
+	}
+	function pyrStop()
+	{
+		clearInterval(id)
+
+		im.style.left = 368+'px';
+		im.style.top = 310+'px';
+						im.height = h;
+		im.width = w;
+
+	}
+	
+	function sleep(miliseconds) {
+   var currentTime = new Date().getTime();
+
+   while (currentTime + miliseconds >= new Date().getTime()) {
+   }
+}
+</script>
+
 </html>

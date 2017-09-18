@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Wiki</title>
+<link rel="stylesheet" href="main_style.css">
+<link rel="stylesheet" href="editor.css">
+</head>
+
+<body>
+
+<div id="header">
+	<div id="about">
+    	<a href="https://www.w3.org/">About as</a>
+		<a href="">Log in</a>
+        <a href="">Exit</a>
+    </div>
+</div>
+<div id="menu">
+	<img src="logojpg.jpg">
+    <div class="item"><img src="home.png" class="icon"><a href="index.html">Home</a></div>
+    <div class="item"><img src="img.png", class="icon"><a href ="sample.html">Samples</a></div>
+	<div class="item"><img src="css.png", class="icon"><a href="css.html">CSS</a></div>
+   	<div class="item"><img src="edit.png", class="icon"><a href="html_editor.html">Html editor</a></div>
+    <hr>
+    <div class="item"><img src="more.png", class="icon"><a href="https://en.wikipedia.org/wiki/HTML">More</a></div>
+</div>
+    <div id="content">
+    <h1 class = "caption">HTML</h1>
+    <hr class="split">
+    <h3>Hypertext Markup Language </h2>
+    <hr class = "split">
+    <table caption = "editor" style="table-layout:fixed;">
+    <tr>
+    	<td id = "text"><textarea id = "code" oninput = "generateHtml()"></textarea></td>
+        <td id = "compiler">result</td>
+    </tr>
+    </table>
+    </div>
+
+</body>
+
+	<script>
+		function generateHtml()
+		{
+			var text = document.getElementById("code").value;
+			var res = document.getElementById("compiler");
+			res.innerHTML = text;
+		}
+	</script>
+</html>

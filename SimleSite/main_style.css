@@ -50,9 +50,9 @@
 }
 
 
-h1
+.caption
 {
-	color:green;
+	color:red;
 }
 
 .icon 
@@ -84,5 +84,13 @@ h1
 
 #css 
 {
-	height:35vh;
+/*	height:35vh;*/
+/*	height:265px;*/
+	position:absolute;
+}
+
+textarea
+{
+    resize: none;
+	
 }

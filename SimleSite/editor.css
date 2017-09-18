@@ -1,0 +1,29 @@
+textarea
+{
+	resize:none;
+}
+
+#code
+{
+	width:80vh;
+	height:58vh;
+}
+
+#compiler
+{
+	resize:none;
+	width:80vh;
+	max-height:58vh;
+	text-align:right;
+}
+
+#editor
+{
+	table-layout:fixed;
+}
+
+#text
+{
+	margin-left:0px;
+}
+
