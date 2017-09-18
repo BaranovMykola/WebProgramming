@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>O_o</title>
+</head>
+<body>
+
+<p id="demo">111</p>
+<select onchange="foo(this);" size = "3">
+	<option>normal</option>
+  	<option>italic</option>
+   	<option>oblique</option>
+    </select>
+    <span>
+    	<span id = "source">
+					Here's a star:
+        <img src="css.png" width="10px" id = "1">
+                	Move it here:
+        </span>
+        <span id = "target">
+
+            </span>
+            </span>
+<input id = "p">
+<script>
+
+//	document.getElementById("demo").innerHTML = "<h1>Hello, world</h1>";
+//	var p = document.getElementById("demo");
+//	p.innerHTML = "Hello, world";
+//	p.style.fontWeight="bold"
+	
+	function foo(a)
+	{
+//		alert(document.getElementById("demo").stle.fontStyle);//error
+		var s = a.options[a.selectedIndex].text;
+//		a.options[a.selectedIndex].text = "000";
+//		s="000";
+		document.getElementById("demo").style.fontStyle = s;
+//		return foo(a);
+//		while (true){alert("111")}
+	};
+//	document.getElementById("1").src = "";
+	document.getElementById('target').appendChild(document.getElementById("1"));
+	
+	var bar = function(e)
+	{
+		if(e.charCode < 48 || e.charCode > 57)
+		{
+			e.preventDefault();
+		}
+	};
+	
+	document.getElementById("p").addEventListener('keypress', bar, false);
+	
+
+</script>
+
+</body>
+</html>
