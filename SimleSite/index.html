@@ -25,7 +25,7 @@
     <div class="item"><img src="more.png", class="icon"><a href="https://en.wikipedia.org/wiki/HTML">More</a></div>
 </div>
     <div id="content">
-    <h1 class = "caption">HTML</h1>
+    <h1 class = "caption" id ="mainCapt" onMouseOver="changeColor()" onMouseOut="stopColor()">HTML</h1>
     <hr class="split">
     <h3>Hypertext Markup Language </h2>
     <hr class = "split">
@@ -36,4 +36,31 @@ HTML can embed programs written in a scripting language such as JavaScript which
     </div>
 
 </body>
+
+<script>
+	var id;
+
+	function changeColor()
+	{
+		id = setInterval(randColor, 5);
+		function randColor()
+		{
+			document.getElementById("mainCapt").style.color = getRandomColor();
+			document.getElementById("mainCapt").style.fontSize = Math.floor(Math.random()*10)+35+'px';
+		}
+			
+	}
+	function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+	}
+	function stopColor()
+	{
+		clearInterval(id);
+	}
+</script>
 </html>

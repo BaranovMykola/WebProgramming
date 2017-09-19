@@ -49,65 +49,52 @@
 </body>
 
 <script>
-	var up = 1;
 	document.getElementById("css").height = 265;
 	var id;
-			var im = document.getElementById("css");
-					var w = im.width;
-		var h = im.height;
-				var step = im.height/im.width;
-		var scale = im.height;
-		var id2;
+	var im = document.getElementById("css");
+	var w = im.width;
+	var h = im.height;
+	var step = im.height/im.width;
+	var scale = im.height;
+	
 	function pyrUp()
 	{
-
-		clearInterval(id2);
-		  id = setInterval(frame, 5)
-		  function frame() {
-			if (im.width == 700) {
-			  clearInterval(id);
-			} else {
-				
+		clearInterval(id);
+	    id = setInterval(up, 5)
+		function up() {
+			if (im.width == 700) 
+			{
+				clearInterval(id);
+			}
+			else
+			{
 				im.width+=1;
 				scale+=step;
 				im.height=scale;
 				im.style.left = 368-(im.width-w)/2+'px';
 				im.style.top = 310-(im.height-h)/2+'px';
-
 			}
-		  }
+		}
 	}
 	function pyrStop()
 	{
 		clearInterval(id)
-		
-				  id2 = setInterval(frame2, 5)
-		  function frame2() {
-			if (im.width == w) {
-			  clearInterval(id2);
-			} else {
-				
+		id = setInterval(down, 5)
+		function down() {
+			if (im.width == w) 
+			{
+				createButt();
+			  clearInterval(id);
+			}
+			else
+			{
 				im.width-=1;
 				scale-=step;
 				im.height=scale;
 				im.style.left = 368-(im.width-w)/2+'px';
 				im.style.top = 310-(im.height-h)/2+'px';
-
 			}
-		  }
-
-	//	im.style.left = 368+'px';
-	//	im.style.top = 310+'px';
-	//					im.height = h;
-	//	im.width = w;
-
-	}
-	
-	function sleep(miliseconds) {
-   var currentTime = new Date().getTime();
-
-   while (currentTime + miliseconds >= new Date().getTime()) {
-   }
+	  }
 }
 </script>
 
