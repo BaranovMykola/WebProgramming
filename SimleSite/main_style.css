@@ -14,7 +14,7 @@
 }
 #menu
 {
-	position:absolute;
+	position:fixed;
 	top:8px;
 	width:300px;
 	height:98vh;
@@ -27,6 +27,7 @@
 	font-size:36px;
 	padding-bottom:10%;
 	padding-top:10%;
+	font-weight:bold;
 }
 
 .item
