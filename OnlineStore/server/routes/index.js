@@ -5,8 +5,8 @@ const router = express.Router();
 //var cookieParser = require('cookie-parser');
 const pg = require('pg');
 const path = require('path');
-const connectionString = process.env.DATABASE_URL
-    || 'postgres://postgres:123@localhost:5432/todo';
+var connectionString = "postgres://postgres:1111@127.0.0.1:5432/online_shop";
+var pgClient = new pg.Client(connectionString);
 
 app.use(session({
     secret: '2C44-4D44-WppQ38S',
@@ -24,21 +24,45 @@ var auth = function(req, res, next) {
   else
     return res.sendStatus(401);
 };
+
+function onConnect(err, client, done) {
+  //Err - This means something went wrong connecting to the database.
+  if (err) {
+    console.error('err');
+    process.exit(1);
+  }
+
+  //For now let's end client
+  client.end();
+}
  
 // Login endpoint
 app.post('/login', function (req, res) {
   if (!req.body.username || !req.body.password) {
-    res.render('/login', {user:req.session.user, message: 'Authentication failed'});
-  } else if(req.body.username === "amy" || req.body.password === "1") {
-    req.session.user = "amy";
-    req.session.admin = true;
-    res.render('index', {user:req.session.user});
-	//return res.redirect('/index');res.redirect('/index/');
-	//res.send('ok');
-  }
-  else
+    res.render('login', {user:req.session.user, message: 'Authentication failed'});
+  } else 
   {
-	  res.render('/login', {user:req.session.user, message: 'Authentication failed'});
+	console.log("okay");
+		pg.connect(connectionString, (err, client, done) => {
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+	const query = client.query('SELECT * FROM users');
+    query.on('row', (row) => {
+      console.log(row);
+    });
+    query.on('end', () => {
+      done();
+      return null;
+    });
+
+  });
+	
+	res.send('str');
+		
+
   }
   
 });
