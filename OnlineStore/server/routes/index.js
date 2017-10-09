@@ -38,32 +38,43 @@ function onConnect(err, client, done) {
  
 // Login endpoint
 app.post('/login', function (req, res) {
-  if (!req.body.username || !req.body.password) {
-    res.render('login', {user:req.session.user, message: 'Authentication failed'});
-  } else 
-  {
-	console.log("okay");
+	var auth = false;
+	if (!req.body.username || !req.body.password) {
+		auth = true;
+	}
+	else 
+	{
 		pg.connect(connectionString, (err, client, done) => {
-    if(err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-	const query = client.query('SELECT * FROM users');
-    query.on('row', (row) => {
-      console.log(row);
-    });
-    query.on('end', () => {
-      done();
-      return null;
-    });
+		if(err) {
+		  done();
+		  console.log(err);
+		  return res.status(500).json({success: false, data: err});
+		}
+		const query = client.query('SELECT * FROM users where username=($1)', [req.body.username]);
+		query.on('row', (row) => {
+			if(row.password == req.body.password)
+			{
+				auth = true;
+				req.session.user = row.username;
+				req.session.admin = row.admin;
+			}
+		});
+		query.on('end', () => {
+		  done();
+		  if(auth == true)
+		  {
+			  res.render('index', {user:req.session.user});
+		  }
+		  else
+		  {
+			  res.render('login', {user:req.session.user, message: 'Authentication failed'});
+		  }
+		});
+	});	
+}
 
-  });
-	
-	res.send('str');
-		
 
-  }
+	  
   
 });
 
@@ -93,6 +104,78 @@ app.get('/', (req, res, next) => {
   {user:req.session.user});
 });
 
+
+app.post('/signup', function (req, res) {
+	var err = false;
+	if (!req.body.username || !req.body.password || !req.body.password_repeat) {
+		err = true;
+	}
+	else 
+	{
+		var pas1 = req.body.password;
+		var pas2 = req.body.password_repeat;
+		var login = req.body.username;
+		
+		if(pas1 == pas2)
+		{
+			pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				const query = client.query('SELECT * FROM users where username=($1)', [req.body.username]);
+				query.on('row', (row) => {
+					err = true;
+					console.log(row);
+				});
+				query.on('end', () => {
+				  done();
+				  	if(!err)
+					{
+						console.log('okay, create user');
+						createUser(login, pas1, false);
+						console.log('user created?');
+						req.session.user = login;
+						req.session.admin = false;
+						res.render('index', {user:login});
+					}
+					else
+					{
+						res.render('login', {user:null, message: "Nickname already exists"});
+					}
+				});
+			});
+		}
+		else
+		{
+			res.render('login', {user:null, message: "Passwords are not equals"});
+		}
+		
+	
+		
+	}	
+});
+
+
+function createUser(nick, pass, adm)
+{
+	var str = "INSERT INTO users VALUES('"+nick+"', '"+pass+"', '"+adm+"')";
+				pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				console.log('query start');
+				const query = client.query(str);
+				query.on('row', (row) => {
+				});
+				query.on('end', () => {
+				  done();
+				});
+			});
+}
 
 //module.exports = router;
 

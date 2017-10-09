@@ -16,9 +16,16 @@
 		<div class = "log">
 		<h1><%= message %></h1>
 		<form method="post">
-			<input name = "username"/>
-			<input name = "password" type = "password"/>
+			Login: <input name = "username"/>
+			Password: <input name = "password" type = "password"/>
 			<button name = "Log in" class = "button">Log in</button>
+		</form>
+		
+		<form method="post" action = "signup">
+			Login: <input name = "username"/>
+			Password: <input name = "password" type = "password"/>
+			Repeat Password: <input name = "password_repeat" type = "password"/>
+			<button name = "Sign un" class = "button">Sign up</button>
 		</form>
 		</div>
 	</div>
