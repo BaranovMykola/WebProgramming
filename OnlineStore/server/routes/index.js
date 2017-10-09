@@ -57,6 +57,7 @@ app.post('/login', function (req, res) {
 				auth = true;
 				req.session.user = row.username;
 				req.session.admin = row.admin;
+				req.session.store = [];
 			}
 		});
 		query.on('end', () => {
@@ -188,6 +189,117 @@ app.get('/admin',  function (req, res) {
 		res.render('index', info);
 	}
 });
+
+function cat(req,res)
+{
+	const rows = [];
+			pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				console.log('query start');
+				const query = client.query("SELECT * FROM catalog");
+				query.on('row', (row) => {
+					rows.push(row);
+					console.log(row);
+				});
+				query.on('end', () => {
+				  done();
+				  console.log(rows.length);
+				  res.render('catalog', {user:req.session.user,admin:req.session.admin, catalog:rows});
+				});
+			});
+}
+
+app.get('/catalog', function (req, res) {
+	
+			const rows = [];
+			pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				console.log('query start');
+				const query = client.query("SELECT * FROM catalog");
+				query.on('row', (row) => {
+					rows.push(row);
+					console.log(row);
+				});
+				query.on('end', () => {
+				  done();
+				  console.log(rows.length);
+				  res.render('catalog', {user:req.session.user,admin:req.session.admin, catalog:rows});
+				});
+			});
+			
+	
+});
+
+app.get('/buy', function (req, res) {
+	
+		var item;
+		if(req.query.act)
+		{
+			console.log('act defined!');
+			console.log(req.query.act);
+			if(req.query.act == "delete")
+			{
+				for(var i =0;i<req.session.store.length;++i)
+				{
+					if(req.session.store[i].id == req.query.id)
+					{
+						req.session.store.splice(i,1);
+					}
+				}
+				res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});	
+			}
+			else if(req.query.act == "buy")
+			{
+				console.log('act == buy!');
+				var totalPrice = 0;
+				for(var i =0;i<req.session.store.length;++i)
+				{
+					totalPrice+=req.session.store[i].price;
+				}
+				req.session.store = [];
+				var storeTotal = [];
+				storeTotal.push(({img :"bucket.png",name:"Total", description:"",price:totalPrice}));
+				res.render('buy', {user:req.session.user,admin:req.session.admin,store:storeTotal,total:true});	
+			}
+			console.log('not buy?');
+		}
+		else if(req.query.id)
+		{
+				pg.connect(connectionString, (err, client, done) => {
+					if(err) {
+					  done();
+					  console.log(err);
+					  return res.status(500).json({success: false, data: err});
+					}
+						const query = client.query("SELECT * FROM catalog where id = " +req.query.id);
+						query.on('row', (row) => {
+							item = row;
+							//console.log(row);
+					});
+					query.on('end', () => {
+					  done();
+					  req.session.store.push(item);
+					  console.log(req.session.store);
+					  res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});
+					});
+				});
+		}
+		else
+		{
+			res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});
+		}
+	
+});
+
+//app.get('/store'
 
 
 module.exports = app;

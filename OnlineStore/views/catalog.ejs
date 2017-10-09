@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/assets/index.css">
+</head>
+<body>
+	<div id = "header">
+		<a class = "menuItem" href = "/login">
+			<% if(!user) { %> Log in <% } else { %> Log out <% } %>
+		</a>
+		</a>
+		<a class = "menuItem" href = "/catalog">Catalog</a>
+		<a class = "menuItem" href = "/buy">Bucket</a>
+		<% if(admin) { %><a href = "/admin" class = "menuItem"><%= user %></a> <% } else 
+		{ %> <h1 class = "menuItem"><%= user %></h1> <% } %>
+		
+	</div>
+	<div id ="content">
+		<table caption = "Ctalog" class="steelBlueCols">
+			<tr>
+				<th>Image</th>
+				<th>Name</th>
+				<th>Description</th>
+				<th>Price</th>
+			</tr>
+			
+			<% for(var i = 0;i<catalog.length;++i) { var m = "/assets/"+catalog[i].img; console.log(m); %>
+			<tr>
+				<td>
+					<img src = <%= "/assets/"+catalog[i].img %> class = "ico" >
+					<br/>
+					<a href = <%= "/buy?id="+catalog[i].id %> class = "menuItem">Buy</a>
+				</td>
+				<td><%= catalog[i].name %></td>
+				<td><%= catalog[i].description %></td>
+				<td><%= catalog[i].price %></td>
+			</tr>
+			<% } %>
+		</table>
+	</div>
+	<div id = "header">
+	</div>
+
+</body>
+</html>
