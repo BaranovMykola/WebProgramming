@@ -248,6 +248,11 @@ function addItem(req,res,next)
 			var img = req.body.image;
 			var price = parseInt(req.body.price);
 			var disco = parseInt(req.body.discount);
+			if(req.body.discount == "0")
+			{
+				disco = "0";
+			}
+			console.log("disco = "+	disco);
 			if(price == "" || disco == "")
 			{
 				
@@ -351,7 +356,10 @@ function cat(req,res)
 }
 
 app.get('/catalog', function (req, res) {
-	
+			if(!req.query.page)
+			{
+				req.query.page= 0;
+			}
 			const rows = [];
 			pg.connect(connectionString, (err, client, done) => {
 				if(err) {
@@ -369,7 +377,7 @@ app.get('/catalog', function (req, res) {
 				query.on('end', () => {
 				  done();
 				  console.log(rows.length);
-				  res.render('catalog', {user:req.session.user,admin:req.session.admin, catalog:rows});
+				  res.render('catalog', {user:req.session.user,admin:req.session.admin, catalog:rows,page:req.query.page});
 				});
 			});
 			
