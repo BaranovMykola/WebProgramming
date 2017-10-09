@@ -63,7 +63,7 @@ app.post('/login', function (req, res) {
 		  done();
 		  if(auth == true)
 		  {
-			  res.render('index', {user:req.session.user});
+			  res.render('index', {user:req.session.user, admin:req.session.admin});
 		  }
 		  else
 		  {
@@ -101,7 +101,7 @@ console.log("app running at http://localhost:3000");
 app.get('/', (req, res, next) => {
   res.render(
   'index.ejs',	
-  {user:req.session.user});
+  {user:req.session.user, admin:req.session.admin});
 });
 
 
@@ -177,7 +177,17 @@ function createUser(nick, pass, adm)
 			});
 }
 
-//module.exports = router;
+app.get('/admin',  function (req, res) {
+	var info = {user:req.session.user,admin:req.session.admin};
+	if(req.session.admin)
+	{
+		res.render('admin', info);
+	}
+	else
+	{
+		res.render('index', info);
+	}
+});
 
 
 module.exports = app;
