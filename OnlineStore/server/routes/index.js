@@ -40,7 +40,7 @@ function onConnect(err, client, done) {
 app.post('/login', function (req, res) {
 	var auth = false;
 	if (!req.body.username || !req.body.password) {
-		auth = true;
+		res.render('login', {user:req.session.user, message: 'You should fill all fields!'});
 	}
 	else 
 	{
@@ -109,7 +109,7 @@ app.get('/', (req, res, next) => {
 app.post('/signup', function (req, res) {
 	var err = false;
 	if (!req.body.username || !req.body.password || !req.body.password_repeat) {
-		err = true;
+		res.render('login', {user:req.session.user, message: 'You should fill all fields!'});
 	}
 	else 
 	{
@@ -180,7 +180,7 @@ function createUser(nick, pass, adm)
 
 function adm(req,res)
 {
-		var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
+	var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
 	if(req.session.admin)
 	{
 			var cat = [];
@@ -209,9 +209,74 @@ function adm(req,res)
 	}
 }
 
+function deleteItem(req, res, id, next)
+{
+	pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				const query = client.query("DELETE FROM catalog where id = "+id);
+				query.on('row', (row) => {
+				});
+				query.on('end', () => {
+				  done();
+				  next(req,res);
+				});
+			});
+}
+
 app.get('/admin',  function (req, res) {
-	adm(req,res);
+	if(req.query.act && req.query.id && req.query.act=="delete")
+	{
+		console.log('start deleting');
+			deleteItem(req,res,req.query.id,adm);
+	}
+	else
+	{
+		adm(req,res);
+	}
 });
+
+function addItem(req,res,next)
+{
+			var info = {user:req.session.user,admin:req.session.admin,err_mess:"You price or discount are invalid"};
+			var name = req.body.name;
+			var id = req.body.id;
+			var descr = req.body.descr;
+			var img = req.body.image;
+			var price = parseInt(req.body.price);
+			var disco = parseInt(req.body.discount);
+			if(price == "" || disco == "")
+			{
+				
+				res.render('error', info);
+			}
+			else
+			{
+					console.log("start generatin query");
+					var str = "insert into catalog (name,description, img, price, discount) values('"+name+"', '"+descr+"', '"+img+"', "+price+", "+disco+")";
+					console.log(str);
+					pg.connect(connectionString, (err, client, done) => {
+					if(err) {
+					  done();
+					  console.log(err);
+					  res.render('error', info);
+					}
+					else
+					{
+						const query = client.query(str);
+						query.on('row', (row) => {
+						});
+						query.on('end', () => {
+						  done();
+						  next(req,res);
+						});
+					}
+				});
+			}
+}
 
 app.post('/admin', function(req,res)
 {
@@ -219,34 +284,40 @@ app.post('/admin', function(req,res)
 	var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
 	if(req.session.admin)
 	{
-	//update catalog set name = 'NAME' where id = 1
-		var name = req.body.name;
-		var id = req.body.id;
-		var descr = req.body.descr;
-		var img = req.body.image;
-		var price = req.body.price;
-		console.log("name = " +name);
-		console.log("img = " +img);
-		var q = "UPDATE catalog SET name = '"+name+"', price = "+price+", img = '"+img+"', description = '"+descr+"' WHERE id = "+id;
-		console.log("query = " + q);
-	
-		pg.connect(connectionString, (err, client, done) => {
-				if(err) {
-				  done();
-				  console.log(err);
-				  return res.status(500).json({success: false, data: err});
-				}
-				console.log('query start');
-				const query = client.query(q);
-				query.on('row', (row) => {
-					console.log("updated "+row);
-				});
-				query.on('end', () => {
-				  done();
-				  adm(req,res);
-				});
-			});
-			
+		if(req.body.act == "new")
+		{
+			addItem(req,res,adm);
+		}
+		else
+		{
+			var name = req.body.name;
+			var id = req.body.id;
+			var descr = req.body.descr;
+			var img = req.body.image;
+			var price = req.body.price;
+			var disco = req.body.discount;
+			console.log("name = " +name);
+			console.log("img = " +img);
+			var q = "UPDATE catalog SET name = '"+name+"', price = "+price+", img = '"+img+"', description = '"+descr+"', discount = "+disco+" WHERE id = "+id;
+			console.log("query = " + q);
+		
+			pg.connect(connectionString, (err, client, done) => {
+					if(err) {
+					  done();
+					  console.log(err);
+					  return res.status(500).json({success: false, data: err});
+					}
+					console.log('query start');
+					const query = client.query(q);
+					query.on('row', (row) => {
+						console.log("updated "+row);
+					});
+					query.on('end', () => {
+					  done();
+					  adm(req,res);
+					});
+				});	
+		}
 	}
 	else
 	{
@@ -293,6 +364,7 @@ app.get('/catalog', function (req, res) {
 				query.on('row', (row) => {
 					rows.push(row);
 					console.log(row);
+					row.price = row.price-row.discount;
 				});
 				query.on('end', () => {
 				  done();

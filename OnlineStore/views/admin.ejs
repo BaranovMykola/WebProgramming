@@ -2,6 +2,8 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="/assets/index.css">
+
+
 </head>
 <body>
 	<div id = "header">
@@ -17,17 +19,33 @@
 		
 	</div>
 	<div id ="content">
-				<table caption = "Ctalog" class="steelBlueCols">
+				<table caption = "Ctalog" class="steelBlueCols" id = "admtable">
 			<tr>
 				<th>Image</th>
-				<th>Name</th>
-				<th>Description</th>
-				<th>Price</th>
+				<th>Info</th>
 			</tr>
-			
+			<tr>
+				<td id = "admcol">
+				<h1>New item</h1>
+					<img src = "/assets/new.jpg" class = "ico" >
+				</td>
+				<td>
+					<form action = "/admin" method="post">
+						Name: <br><input name="name"/><hr>
+						Image:<br><input name="image" /><hr>
+						Price:<br><input name = "price" value = "0" /><hr>
+						Discount:<br><input name = "discount" value = "0" /><hr>
+						Description:<br/>
+						<textarea name="descr" class = "descr"></textarea><br/>
+						<input name = "act" type = "hidden" value = "new" />
+						<button class = "button">Add new</button>
+					</form>				
+				</td>
+				
+			</tr>
 			<% for(var i = 0;i<catalog.length;++i) { var m = "/assets/"+catalog[i].img; console.log(m); %>
 			<tr>
-				<td>
+				<td id = "admcol">
 					<img src = <%= "/assets/"+catalog[i].img %> class = "ico" >
 					<br/>
 					<a href = <%= "/buy?id="+catalog[i].id %> class = "menuItem">Buy</a>
@@ -36,12 +54,15 @@
 					<form action = "/admin" method="post">
 						Name: <br><input name="name" value = "<%= catalog[i].name %>" /><hr>
 						Image:<br><input name="image" value = "<%= catalog[i].img %>" /><hr>
-						Price:<br><input name = "price" value = "<%= catalog[i].price %>" /><hr>
+						Price:<br><input name = "price" value = "<%= catalog[i].price %>" onchange="bar()"/><hr>
+						Discount:<br><input name = "discount" value = "<%= catalog[i].discount %>"/><hr>
 						Description:<br/>
 						<textarea name="descr" class = "descr"><%= catalog[i].description %></textarea><br/>
 						<input name = "id" type = "hidden" value = "<%= catalog[i].id %>" />
 						<button class = "button">Update</button>
 					</form>
+					<hr/>
+					<a href = <%= "/admin?act=delete&id="+catalog[i].id %> class = "button">Delete</a>
 				</td>
 				
 			</tr>

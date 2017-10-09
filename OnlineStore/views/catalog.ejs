@@ -34,7 +34,18 @@
 				</td>
 				<td><%= catalog[i].name %></td>
 				<td><%= catalog[i].description %></td>
-				<td><%= catalog[i].price %></td>
+				<td>
+					<% if(catalog[i].discount > 0) { %>
+						<h1 class = "disco">
+							<%= catalog[i].price %>
+							<br/>
+							Discount: -<%= catalog[i].discount %>
+						</h1>
+					<% } else { %>
+					<%= catalog[i].price %>
+					<% } %>
+						
+				</td>
 			</tr>
 			<% } %>
 		</table>

@@ -162,3 +162,11 @@ table.steelBlueCols tfoot .links a{
 {
 	max-width:300px;
 }
+
+.disco
+{
+	color: #89e3ff;
+	font-size: 30px;
+	font-weight: bold;
+	font-style: italic;
+}
