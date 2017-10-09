@@ -11,12 +11,42 @@
 		</a>
 		<a class = "menuItem" href = "/catalog">Catalog</a>
 		<a class = "menuItem" href = "/buy">Bucket</a>
+		<a class = "menuItem" href = "/">Home</a>
 		<% if(admin) { %><a href = "/admin" class = "menuItem"><%= user %></a> <% } else 
 		{ %> <h1 class = "menuItem"><%= user %></h1> <% } %>
 		
 	</div>
 	<div id ="content">
-		<h1>Welcome to admin</h1>
+				<table caption = "Ctalog" class="steelBlueCols">
+			<tr>
+				<th>Image</th>
+				<th>Name</th>
+				<th>Description</th>
+				<th>Price</th>
+			</tr>
+			
+			<% for(var i = 0;i<catalog.length;++i) { var m = "/assets/"+catalog[i].img; console.log(m); %>
+			<tr>
+				<td>
+					<img src = <%= "/assets/"+catalog[i].img %> class = "ico" >
+					<br/>
+					<a href = <%= "/buy?id="+catalog[i].id %> class = "menuItem">Buy</a>
+				</td>
+				<td>
+					<form action = "/admin" method="post">
+						Name: <br><input name="name" value = "<%= catalog[i].name %>" /><hr>
+						Image:<br><input name="image" value = "<%= catalog[i].img %>" /><hr>
+						Price:<br><input name = "price" value = "<%= catalog[i].price %>" /><hr>
+						Description:<br/>
+						<textarea name="descr" class = "descr"><%= catalog[i].description %></textarea><br/>
+						<input name = "id" type = "hidden" value = "<%= catalog[i].id %>" />
+						<button class = "button">Update</button>
+					</form>
+				</td>
+				
+			</tr>
+			<% } %>
+		</table>
 	</div>
 	<div id = "header">
 	</div>

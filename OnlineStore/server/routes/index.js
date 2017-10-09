@@ -139,7 +139,7 @@ app.post('/signup', function (req, res) {
 						console.log('user created?');
 						req.session.user = login;
 						req.session.admin = false;
-						res.render('index', {user:login});
+						res.render('index', {user:login,admin:req.session.admin});
 					}
 					else
 					{
@@ -178,16 +178,82 @@ function createUser(nick, pass, adm)
 			});
 }
 
-app.get('/admin',  function (req, res) {
-	var info = {user:req.session.user,admin:req.session.admin};
+function adm(req,res)
+{
+		var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
 	if(req.session.admin)
 	{
-		res.render('admin', info);
+			var cat = [];
+			pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				const query = client.query("SELECT * FROM catalog ORDER BY id");
+				query.on('row', (row) => {
+					cat.push(row);
+				});
+				query.on('end', () => {
+				  done();
+				  info.catalog = cat;
+				  console.log(cat);
+				  res.render('admin', info);
+				});
+			});
+		
 	}
 	else
 	{
-		res.render('index', info);
+		res.render('error', info);
 	}
+}
+
+app.get('/admin',  function (req, res) {
+	adm(req,res);
+});
+
+app.post('/admin', function(req,res)
+{
+
+	var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
+	if(req.session.admin)
+	{
+	//update catalog set name = 'NAME' where id = 1
+		var name = req.body.name;
+		var id = req.body.id;
+		var descr = req.body.descr;
+		var img = req.body.image;
+		var price = req.body.price;
+		console.log("name = " +name);
+		console.log("img = " +img);
+		var q = "UPDATE catalog SET name = '"+name+"', price = "+price+", img = '"+img+"', description = '"+descr+"' WHERE id = "+id;
+		console.log("query = " + q);
+	
+		pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				  return res.status(500).json({success: false, data: err});
+				}
+				console.log('query start');
+				const query = client.query(q);
+				query.on('row', (row) => {
+					console.log("updated "+row);
+				});
+				query.on('end', () => {
+				  done();
+				  adm(req,res);
+				});
+			});
+			
+	}
+	else
+	{
+		res.render('error', info);
+	}	
+			
+
 });
 
 function cat(req,res)
@@ -241,60 +307,67 @@ app.get('/catalog', function (req, res) {
 app.get('/buy', function (req, res) {
 	
 		var item;
-		if(req.query.act)
+		if(req.session.user)
 		{
-			console.log('act defined!');
-			console.log(req.query.act);
-			if(req.query.act == "delete")
+			if(req.query.act)
 			{
-				for(var i =0;i<req.session.store.length;++i)
+				console.log('act defined!');
+				console.log(req.query.act);
+				if(req.query.act == "delete")
 				{
-					if(req.session.store[i].id == req.query.id)
+					for(var i =0;i<req.session.store.length;++i)
 					{
-						req.session.store.splice(i,1);
+						if(req.session.store[i].id == req.query.id)
+						{
+							req.session.store.splice(i,1);
+						}
 					}
+					res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});	
 				}
-				res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});	
-			}
-			else if(req.query.act == "buy")
-			{
-				console.log('act == buy!');
-				var totalPrice = 0;
-				for(var i =0;i<req.session.store.length;++i)
+				else if(req.query.act == "buy")
 				{
-					totalPrice+=req.session.store[i].price;
-				}
-				req.session.store = [];
-				var storeTotal = [];
-				storeTotal.push(({img :"bucket.png",name:"Total", description:"",price:totalPrice}));
-				res.render('buy', {user:req.session.user,admin:req.session.admin,store:storeTotal,total:true});	
-			}
-			console.log('not buy?');
-		}
-		else if(req.query.id)
-		{
-				pg.connect(connectionString, (err, client, done) => {
-					if(err) {
-					  done();
-					  console.log(err);
-					  return res.status(500).json({success: false, data: err});
+					console.log('act == buy!');
+					var totalPrice = 0;
+					for(var i =0;i<req.session.store.length;++i)
+					{
+						totalPrice+=req.session.store[i].price;
 					}
-						const query = client.query("SELECT * FROM catalog where id = " +req.query.id);
-						query.on('row', (row) => {
-							item = row;
-							//console.log(row);
+					req.session.store = [];
+					var storeTotal = [];
+					storeTotal.push(({img :"bucket.png",name:"Total", description:"",price:totalPrice}));
+					res.render('buy', {user:req.session.user,admin:req.session.admin,store:storeTotal,total:true});	
+				}
+				console.log('not buy?');
+			}
+			else if(req.query.id)
+			{
+					pg.connect(connectionString, (err, client, done) => {
+						if(err) {
+						  done();
+						  console.log(err);
+						  return res.status(500).json({success: false, data: err});
+						}
+							const query = client.query("SELECT * FROM catalog where id = " +req.query.id);
+							query.on('row', (row) => {
+								item = row;
+								//console.log(row);
+						});
+						query.on('end', () => {
+						  done();
+						  req.session.store.push(item);
+						  console.log(req.session.store);
+						  res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});
+						});
 					});
-					query.on('end', () => {
-					  done();
-					  req.session.store.push(item);
-					  console.log(req.session.store);
-					  res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});
-					});
-				});
+			}
+			else
+			{
+				res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});
+			}
 		}
 		else
 		{
-			res.render('buy', {user:req.session.user,admin:req.session.admin,store:req.session.store,total:false});
+			res.render('error', {user:req.session.user,admin:req.session.admin,err_mess:"You have not been authenticated yet!"});
 		}
 	
 });

@@ -21,8 +21,8 @@
   text-overflow: ellipsis;
   -webkit-box-shadow: 5px 5px 8px 2px rgba(0,0,0,0.4) ;
   box-shadow: 5px 5px 8px 2px rgba(0,0,0,0.4) ;
-  margin-left:100px;
-  margin-right:100px;
+  margin-left:70px;
+  margin-right:70px;
   display: inline-block;
   font-size:40px;
 }
@@ -156,4 +156,9 @@ table.steelBlueCols tfoot .links a{
 .ico 
 {
 	max-width:200px;
+}
+
+.descr
+{
+	max-width:300px;
 }
