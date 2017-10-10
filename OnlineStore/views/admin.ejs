@@ -38,12 +38,19 @@
 						Description:<br/>
 						<textarea name="descr" class = "descr"></textarea><br/>
 						<input name = "act" type = "hidden" value = "new" />
+						<input name = "page" type = "hidden" value = <%= page %> />
 						<button class = "button">Add new</button>
 					</form>				
 				</td>
 				
 			</tr>
-			<% for(var i = 0;i<catalog.length;++i) { var m = "/assets/"+catalog[i].img; console.log(m); %>
+			<% var h = 5;
+			console.log("pag1e = " + page);
+			var p1 = parseInt(page)+1;
+			console.log("Nextpag1e = " + p1);
+			console.log("from = " + page*h);
+			console.log("to = " + p1*h);
+				for(var i = page*h;i<p1*h && i<catalog.length;++i) { %>
 			<tr>
 				<td id = "admcol">
 					<img src = <%= "/assets/"+catalog[i].img %> class = "ico" >
@@ -68,6 +75,8 @@
 			</tr>
 			<% } %>
 		</table>
+		<% if(page-1>= 0) { %> <a href = <%= "/admin?page="+(page-1) %> class = "buttonPrev">Previous</a> <% } %>
+		<% if(p1*h < catalog.length) { %> <a href = <%= "/admin?page="+p1 %> class = "button">Next</a> <% } %>
 	</div>
 	<div id = "header">
 	</div>

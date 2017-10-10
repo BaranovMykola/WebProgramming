@@ -183,6 +183,13 @@ function adm(req,res)
 	var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
 	if(req.session.admin)
 	{
+			if(!req.query.page)
+			{
+				req.query.page= 0;
+			}
+
+			
+			info.page = req.query.page;
 			var cat = [];
 			pg.connect(connectionString, (err, client, done) => {
 				if(err) {
@@ -197,7 +204,8 @@ function adm(req,res)
 				query.on('end', () => {
 				  done();
 				  info.catalog = cat;
-				  console.log(cat);
+				 // console.log(cat);
+				  console.log('info.page = ' + info.page);
 				  res.render('admin', info);
 				});
 			});
