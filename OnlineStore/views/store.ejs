@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/assets/index.css">
+
+
+</head>
+<body>
+	<div id = "header">
+		<a class = "menuItem" href = "/login">
+			<% if(!user) { %> Log in <% } else { %> Log out <% } %>
+		</a>
+		</a>
+		<a class = "menuItem" href = "/catalog">Catalog</a>
+		<a class = "menuItem" href = "/buy">Bucket</a>
+		<a class = "menuItem" href = "/">Home</a>
+		<% if(admin) { %><a href = "/admin" class = "menuItem"><%= user %></a> <% } else 
+		{ %> <h1 class = "menuItem"><%= user %></h1> <% } %>
+		
+	</div>
+	<div id ="content">
+				<table caption = "Orders" class="steelBlueCols" id = "admtable">
+			<tr>
+				<th>User</th>
+				<th>Items</th>
+				<th>Price</th>
+			</tr>
+			<%
+				for(var i = 0;i<catalog.length;++i) { %>
+			<tr>
+				<td id = "admcol">
+					<h3><%= catalog[i].user_id %></h3>
+				</td>
+				<td>
+					<a href = <%= "/items?user_id="+catalog[i].user_id %> class="button">Show items</a>
+				</td>
+				<td>
+					<h3><%= catalog[i].sum %></h3>
+				</td>
+				
+			</tr>
+			<% } %>
+		</table>
+	</div>
+	<div id = "header">
+	</div>
+
+</body>
+</html>

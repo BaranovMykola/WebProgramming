@@ -458,10 +458,38 @@ app.get('/buy', function (req, res) {
 					{
 						totalPrice+=req.session.store[i].price;
 					}
-					req.session.store = [];
-					var storeTotal = [];
-					storeTotal.push(({img :"bucket.png",name:"Total", description:"",price:totalPrice}));
-					res.render('buy', {user:req.session.user,admin:req.session.admin,store:storeTotal,total:true});	
+					
+					pg.connect(connectionString, (err, client, done) => {
+						if(err) {
+						  done();
+						  console.log(err);
+						  return res.status(500).json({success: false, data: err});
+						}
+							var q = "insert into store (user_id,item_id) values";
+							for(var i = 0;i<req.session.store.length;++i)
+							{
+								q+="('"+req.session.user+"',"+req.session.store[i].id+")";
+								if(i+1 < req.session.store.length)
+								{
+									q+=",";
+								}
+							}
+							console.log(q);
+							const query = client.query(q);
+							query.on('row', (row) => {
+								//item = row;
+								//console.log(row);
+						});
+						query.on('end', () => {
+						  done();
+							req.session.store = [];
+							var storeTotal = [];
+							storeTotal.push(({img :"bucket.png",name:"Total", description:"",price:totalPrice}));
+							res.render('buy', {user:req.session.user,admin:req.session.admin,store:storeTotal,total:true});
+						});
+					});
+					
+					
 				}
 				console.log('not buy?');
 			}
@@ -498,7 +526,48 @@ app.get('/buy', function (req, res) {
 	
 });
 
+app.get('/store', function(req,res){
+	var rows=[];
+				pg.connect(connectionString, (err, client, done) => {
+						if(err) {
+						  done();
+						  console.log(err);
+						  return res.status(500).json({success: false, data: err});
+						}
+							const query = client.query("SELECT user_id,sum(price) FROM store, catalog where item_id = catalog.id group by user_id");
+							query.on('row', (row) => {
+								row.items = [];
+							rows.push(row);
+								//console.log(row);
+						});
+						query.on('end', () => {
+						  done();
+						  res.render('store', {admin:req.session.admin, user:req.session.user,catalog:rows});
+						});
+				});
+});
 
+app.get('/items', function(req,res){
+	var rows = [];
+				pg.connect(connectionString, (err, client, done) => {
+						if(err) {
+						  done();
+						  console.log(err);
+						  return res.status(500).json({success: false, data: err});
+						}
+							const query = client.query("select name,price, img, description from store,catalog where user_id = '"+req.query.user_id+"' and catalog.id = item_id");
+							query.on('row', (row) => {
+								row.items = [];
+							rows.push(row);
+								//console.log(row);
+						});
+						query.on('end', () => {
+						  done();
+						  res.render('items', {user:req.session.user,admin:req.session.admin,store:rows});
+						});
+				});
+		//res.render('items', {user:req.session.user,admin:req.session.admin,
+});
 
 
 module.exports = app;
