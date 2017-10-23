@@ -16,7 +16,7 @@ app.use(session({
 
 app.set('view engine', 'ejs');
 //app.use(cookieParser("2C44-4D44-WppQ38S"));
- 
+
 // Authentication and Authorization Middleware
 var auth = function(req, res, next) {
   if (req.session && req.session.user === "amy" && req.session.admin)
@@ -247,13 +247,49 @@ app.get('/admin',  function (req, res) {
 	}
 });
 
+var formidable = require('formidable');
+
 function addItem(req,res,next)
 {
+	
+	var form = new formidable.IncomingForm();
+	console.log("formidable passed");
+    form.parse(req, function(err, fields, files) {
+        // `file` is the name of the <input> field of type `file`
+		
+        var old_path = files.file.path,
+            file_size = files.file.size,
+            file_ext = files.file.name.split('.').pop(),
+            index = old_path.lastIndexOf('/') + 1,
+            file_name = old_path.substr(index),
+            new_path = path.join(process.env.PWD, '/uploads/', file_name + '.' + file_ext);
+			console.log("old path = " + old_path);
+
+        fs.readFile(old_path, function(err, data) {
+            fs.writeFile(new_path, data, function(err) {
+                fs.unlink(old_path, function(err) {
+                    if (err) {
+                        res.status(500);
+                        res.json({'success': false});
+                    } else {
+                        res.status(200);
+                        res.json({'success': true});
+                    }
+                });
+            });
+        });
+    });
+	
+	form.on('error', function(err) { console.log(err); });
+	form.on('aborted', function() { console.log('Aborted'); });
+	
+	
 			var info = {user:req.session.user,admin:req.session.admin,err_mess:"You price or discount are invalid"};
 			var name = req.body.name;
 			var id = req.body.id;
 			var descr = req.body.descr;
 			var img = req.body.image;
+			console.log("img = "+img);
 			var price = parseInt(req.body.price);
 			var disco = parseInt(req.body.discount);
 			if(req.body.discount == "0")
@@ -268,9 +304,9 @@ function addItem(req,res,next)
 			}
 			else
 			{
-					console.log("start generatin query");
+					//console.log("start generatin query");
 					var str = "insert into catalog (name,description, img, price, discount) values('"+name+"', '"+descr+"', '"+img+"', "+price+", "+disco+")";
-					console.log(str);
+					//console.log(str);
 					pg.connect(connectionString, (err, client, done) => {
 					if(err) {
 					  done();
@@ -368,6 +404,8 @@ app.get('/catalog', function (req, res) {
 			{
 				req.query.page= 0;
 			}
+			if(!req.query.sort) req.query.sort = "name";
+			if(!req.query.order) req.query.order = "asc"
 			const rows = [];
 			pg.connect(connectionString, (err, client, done) => {
 				if(err) {
@@ -376,7 +414,7 @@ app.get('/catalog', function (req, res) {
 				  return res.status(500).json({success: false, data: err});
 				}
 				console.log('query start');
-				const query = client.query("SELECT * FROM catalog");
+				const query = client.query("SELECT * FROM catalog order by " + req.query.sort + " " + req.query.order);
 				query.on('row', (row) => {
 					rows.push(row);
 					console.log(row);
@@ -385,7 +423,7 @@ app.get('/catalog', function (req, res) {
 				query.on('end', () => {
 				  done();
 				  console.log(rows.length);
-				  res.render('catalog', {user:req.session.user,admin:req.session.admin, catalog:rows,page:req.query.page});
+				  res.render('catalog', {user:req.session.user,admin:req.session.admin, catalog:rows,page:req.query.page, order:req.query.order, sort:req.query.sort});
 				});
 			});
 			
@@ -460,7 +498,7 @@ app.get('/buy', function (req, res) {
 	
 });
 
-//app.get('/store'
+
 
 
 module.exports = app;

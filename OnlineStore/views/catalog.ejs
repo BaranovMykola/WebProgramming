@@ -20,9 +20,10 @@
 		<table caption = "Ctalog" class="steelBlueCols">
 			<tr>
 				<th>Image</th>
-				<th>Name</th>
+				<th>Name <a href = "catalog?sort=name&order=asc" class = "button">A_Z</a> <a href = "catalog?sort=name&order=desc"  class = "button">Z_A</a></th>
 				<th>Description</th>
-				<th>Price</th>
+				<th>Price <a href = "catalog?sort=price&order=asc" class = "button">Lower</a> <a href = "catalog?sort=price&order=desc"  class = "button">Higher</a><br>
+				<a href = "catalog?sort=discount&order=desc" class = "button">Discount</a></th>
 			</tr>
 			
 			<% var h = 5;
@@ -55,8 +56,8 @@
 			</tr>
 			<% } %>
 		</table>
-		<% if(page-1>= 0) { %> <a href = <%= "/catalog?page="+(page-1) %> class = "buttonPrev">Previous</a> <% } %>
-		<% if(p1*h < catalog.length) { %> <a href = <%= "/catalog?page="+p1 %> class = "button">Next</a> <% } %>
+		<% if(page-1>= 0) { %> <a href = <%= "/catalog?page="+(page-1)+"&sort="+sort+"&order="+order %> class = "buttonPrev">Previous</a> <% } %>
+		<% if(p1*h < catalog.length) { %> <a href = <%= "/catalog?page="+p1+"&sort="+sort+"&order="+order %> class = "button">Next</a> <% } %>
 	</div>
 	<div id = "header">
 	</div>

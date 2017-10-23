@@ -32,7 +32,7 @@
 				<td>
 					<form action = "/admin" method="post">
 						Name: <br><input name="name"/><hr>
-						Image:<br><input name="image" /><hr>
+						Image:<br><input name="image" type="file"/><a href="/admin?act=open" class = "button">Open</a><hr>
 						Price:<br><input name = "price" value = "0" /><hr>
 						Discount:<br><input name = "discount" value = "0" /><hr>
 						Description:<br/>
@@ -69,7 +69,7 @@
 						<button class = "button">Update</button>
 					</form>
 					<hr/>
-					<a href = <%= "/admin?act=delete&id="+catalog[i].id %> class = "button">Delete</a>
+					<a href = <%= "/admin?act=delete&id="+catalog[i].id+"&page="+page %> class = "button">Delete</a>
 				</td>
 				
 			</tr>
