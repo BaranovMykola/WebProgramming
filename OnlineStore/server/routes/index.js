@@ -527,28 +527,45 @@ app.get('/buy', function (req, res) {
 });
 
 app.get('/store', function(req,res){
-	var rows=[];
-				pg.connect(connectionString, (err, client, done) => {
-						if(err) {
-						  done();
-						  console.log(err);
-						  return res.status(500).json({success: false, data: err});
-						}
-							const query = client.query("SELECT user_id,sum(price) FROM store, catalog where item_id = catalog.id group by user_id");
-							query.on('row', (row) => {
-								row.items = [];
-							rows.push(row);
-								//console.log(row);
-						});
-						query.on('end', () => {
-						  done();
-						  res.render('store', {admin:req.session.admin, user:req.session.user,catalog:rows});
-						});
+	if(req.session.admin)
+	{
+		if(req.query.user_id)
+		{
+			console.log("delete");
+			pg.connect(connectionString, (err, client, done) => {
+				if(err) {
+				  done();
+				  console.log(err);
+				return res.status(500).json({success: false, data: err});
+				}
+					const query = client.query("delete from store where user_id = '"+req.query.user_id+"'");
+					query.on('row', (row) => {
+						//console.log(row);
 				});
+				query.on('end', () => {
+				  done();
+				  loadStore(req,res);
+				});
+			});
+		}
+		else
+		{
+		
+			loadStore(req,res);
+		}
+	}
+	else
+	{
+		var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
+		res.render('error', info);
+	}
 });
 
 app.get('/items', function(req,res){
-	var rows = [];
+	
+	if(req.session.admin)
+	{
+				var rows = [];
 				pg.connect(connectionString, (err, client, done) => {
 						if(err) {
 						  done();
@@ -566,8 +583,34 @@ app.get('/items', function(req,res){
 						  res.render('items', {user:req.session.user,admin:req.session.admin,store:rows});
 						});
 				});
-		//res.render('items', {user:req.session.user,admin:req.session.admin,
+	}
+	else
+	{
+		var info = {user:req.session.user,admin:req.session.admin,err_mess:"Permission denied!"};
+		res.render('error', info);
+	}
 });
+
+function loadStore(req,res){
+				var rows=[];
+				pg.connect(connectionString, (err, client, done) => {
+						if(err) {
+						  done();
+						  console.log(err);
+						  return res.status(500).json({success: false, data: err});
+						}
+							const query = client.query("SELECT user_id,sum(price) FROM store, catalog where item_id = catalog.id group by user_id");
+							query.on('row', (row) => {
+								row.items = [];
+							rows.push(row);
+								//console.log(row);
+						});
+						query.on('end', () => {
+						  done();
+						  res.render('store', {admin:req.session.admin, user:req.session.user,catalog:rows});
+						});
+				});
+}
 
 
 module.exports = app;
