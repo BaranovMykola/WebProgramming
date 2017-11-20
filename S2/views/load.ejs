@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="/assets/index.css">
+</head>
+<body>
+	<div id = "header">
+		<a class = "menuItem" href = "/">Home</a>
+		<a class = "menuItem" href = "/load">Load</a>
+		<a class = "menuItem" href = "/profile">Profile</a>
+				<a class = "menuItem" href = "/login">
+			<% if(!user) { %> Log in <% } else { %> Log out <% } %>
+		</a>
+		<h1 class = "menuItem"><%= user %></h1>
+	</div>
+	<div id ="content">
+		<form action = "/load" method = "post">
+			<input type = "file", name = "file" class = "button">
+			<input type = "text", name = "result" class = "button">
+			<button class = "button" name = "Load">Load</button>
+		</form>
+	</div>
+	<div id = "header">
+	</div>
+
+</body>
+</html>

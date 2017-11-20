@@ -124,7 +124,7 @@ app.post('/load', function(req,res){
 										  console.log(err);
 										  return res.status(500).json({success: false, data: err});
 										}
-										const query = client.query("update performance set threads = threads+1 where server = "+s);
+										const query = client.query("update performance set threads = threads+"+req.body.file.length+" where server = "+s);
 										query.on('row', (row) => {
 											
 											
@@ -133,7 +133,9 @@ app.post('/load', function(req,res){
 										});
 										query.on('end', () => {
 										  done();
-										  res.redirect(307, 'http://localhost:5000/do?task='+taskId);
+										  
+											res.redirect(307, 'http://localhost:5000/do?task='+taskId);
+									
 										});
 									});
 						  
