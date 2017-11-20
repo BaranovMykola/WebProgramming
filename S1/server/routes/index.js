@@ -45,7 +45,10 @@ function start(inf,i)
 {
 	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+inf[i].file+' assets/'+inf[i].result, 
 		function callback(error, stdout, stderr){
+			if(i+1 < inf.length)
+			{
 					start(inf,i+1);
+			}
 	});	
 }
 

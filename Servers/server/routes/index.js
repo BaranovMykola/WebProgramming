@@ -133,8 +133,16 @@ app.post('/load', function(req,res){
 										});
 										query.on('end', () => {
 										  done();
-										  
+										  if(s == 1)
+										  {
+											  console.log(':5000 port');
 											res.redirect(307, 'http://localhost:5000/do?task='+taskId);
+										  }
+										  else if (s == 2)
+										  {
+											  console.log(':8088 port');
+											  res.redirect(307, 'http://localhost:8088/do?task='+taskId);
+										  }
 									
 										});
 									});
