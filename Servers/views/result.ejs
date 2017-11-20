@@ -16,25 +16,15 @@
 	<div id ="content">
 		<table caption = "Ctalog" class="steelBlueCols">
 			<tr>
-				<th>Task</th>
-				<th>Server</th>
-				<th>Start</th>
-				<th>Progress</th>
+				<th>Image</th>
+				<th>Response</th>
 			</tr>
 			
-			<% for(var i =0;i<conf.length;++i) { console.log(conf[i]); %>
-			
+			<% for(var i =0;i<conf.length;++i) { %>
 			<tr>
-				<td> Task № <%= conf[i].id %> </td>
-				<td> Server № <%= conf[i].server %> </td>
-				<td> <%= conf[i].start %> </td>
-				<td> 
-					<a href = <%= "/result?task="+conf[i].id %> class = "button">
-						<%= (conf[i].file / conf[i].files * 100).toFixed(2) %> %
-					</a>
-				</td>
+				<td> <img src = <%= "/assets/"+conf[i].file %> class = "ico"> </td>
+				<td> <img src = <%= "/assets/"+conf[i].result %> class = "ico"> </td>
 			</tr>
-			
 			<% } %>
 		</table>
 	</div>

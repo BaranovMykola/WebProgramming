@@ -194,13 +194,41 @@ app.get('/profile', function(req,res){
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query("select * from task inner join files on task.id = task where username = '"+req.session.user+"'");
+			const query = client.query("select * from task where username = '"+req.session.user+"'");
 			query.on('row', (row) => {
-				rows.push({file:row.file,result:row.result});
+				rows.push(row);
 			});
 			query.on('end', () => {
 			  done();
 				res.render('profile.ejs', {conf:rows, user:req.session.user});
+			});
+		});
+		
+		
+	}
+	else
+	{
+		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user});
+	}
+});
+
+app.get('/result', function(req,res){
+	if(req.session.user)
+	{
+		var rows = [];
+		pg.connect(connectionString, (err, client, done) => {
+			if(err) {
+			  done();
+			  console.log(err);
+			  return res.status(500).json({success: false, data: err});
+			}
+			const query = client.query("select * from files where task = "+req.query.task);
+			query.on('row', (row) => {
+				rows.push(row);
+			});
+			query.on('end', () => {
+			  done();
+				res.render('result.ejs', {conf:rows, user:req.session.user});
 			});
 		});
 		

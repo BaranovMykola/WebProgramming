@@ -43,8 +43,27 @@ function lgg()
 
 function start(inf,i)
 {
-	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+inf[i].file+' assets/'+inf[i].result, 
+	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+inf[i].file+' '+inf[i].result, 
 		function callback(error, stdout, stderr){
+			console.log(stdout);
+			
+													  pg.connect(connectionString, (err, client, done) => {
+										if(err) {
+										  done();
+										  console.log(err);
+										  return res.status(500).json({success: false, data: err});
+										}
+										const query = client.query("update task set file = file+1 where id = " + inf[i].task);
+										query.on('row', (row) => {
+											console.log('files incremented');
+																					
+												
+										});
+										query.on('end', () => {
+										  done();
+										});
+									});
+			
 			if(i+1 < inf.length)
 			{
 					start(inf,i+1);
