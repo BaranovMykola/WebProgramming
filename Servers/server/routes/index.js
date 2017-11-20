@@ -36,6 +36,7 @@ app.post('/load', function(req,res){
 //	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+req.body.file+' assets/'+req.body.result+'.jpg', function callback(error, stdout, stderr){
 				
 	//});
+	var taskId;
 	if(!req.session.user)
 	{
 		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user});
@@ -74,8 +75,15 @@ app.post('/load', function(req,res){
 						query.on('row', (row) => {
 							
 							console.log("returned id = " + row.id);
+							taskId = row.id;
 							
 							var str = "";
+							if(!Array.isArray(req.body.file))
+							{
+								req.body.file = [req.body.file];
+								console.log('handled');
+							}
+							console.log(req.body.file);
 							for(var i =0;i<req.body.file.length;++i)
 							{
 								str += "('"+req.body.file[i]+"','"+randomstring.generate()+".jpg',"+s+","+row.id+")";
@@ -125,7 +133,7 @@ app.post('/load', function(req,res){
 										});
 										query.on('end', () => {
 										  done();
-										  
+										  res.redirect(307, 'http://localhost:5000/do?task='+taskId);
 										});
 									});
 						  
@@ -140,7 +148,7 @@ app.post('/load', function(req,res){
 			
 			
 			
-		res.render('profile.ejs', {conf:req.session.store, user:req.session.user});//});
+		//res.render('profile.ejs', {conf:req.session.store, user:req.session.user});//});
 	}
 });
 
@@ -322,7 +330,7 @@ function createUser(nick, pass, adm)
 
 app.get('/test1', function(req,res)
 {
-	res.redirect(307, 'http://localhost:5000/');
+	res.redirect(307, 'http://localhost:5000/do?task=123');
 });
 
 
