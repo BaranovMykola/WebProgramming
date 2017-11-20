@@ -20,7 +20,12 @@
 				<th>Response</th>
 			</tr>
 			
-
+			<% for(var i =0;i<conf.length;++i) { %>
+			<tr>
+				<td> <img src = <%= "/assets/"+conf[i].file %> class = "ico"> </td>
+				<td> <img src = <%= "/assets/"+conf[i].result %> class = "ico"> </td>
+			</tr>
+			<% } %>
 		</table>
 	</div>
 	<div id = "header">

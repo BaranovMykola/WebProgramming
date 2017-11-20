@@ -4,6 +4,7 @@ var session = session = require('express-session');
 const router = express.Router();
 //var cookieParser = require('cookie-parser');
 const pg = require('pg');
+var randomstring = require("randomstring");
 const path = require('path');
 var connectionString = "postgres://postgres:1111@127.0.0.1:5432/Tasks";
 var pgClient = new pg.Client(connectionString);
@@ -74,6 +75,36 @@ app.post('/load', function(req,res){
 							
 							console.log("returned id = " + row.id);
 							
+							var str = "";
+							for(var i =0;i<req.body.file.length;++i)
+							{
+								str += "('"+req.body.file[i]+"','"+randomstring.generate()+".jpg',"+s+","+row.id+")";
+								if(i+1 != req.body.file.length)
+								{
+									str += ',';
+								}
+							}
+							console.log('inserting //'+str+'//');
+							
+												pg.connect(connectionString, (err, client, done) => {
+										if(err) {
+										  done();
+										  console.log(err);
+										  return res.status(500).json({success: false, data: err});
+										}
+										const query = client.query("insert into files (file, result,server,task) values"+str);
+										query.on('row', (row) => {
+											
+											
+											
+											
+										});
+										query.on('end', () => {
+										  done();
+										  
+										});
+												});
+							
 							
 						});
 						query.on('end', () => {
@@ -138,21 +169,20 @@ function minServer()
 app.get('/profile', function(req,res){
 	if(req.session.user)
 	{
-		
-					pg.connect(connectionString, (err, client, done) => {
+		var rows = [];
+		pg.connect(connectionString, (err, client, done) => {
 			if(err) {
 			  done();
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query('select * from performance order by threads LIMIT 1');
+			const query = client.query("select * from task inner join files on task.id = task where username = '"+req.session.user+"'");
 			query.on('row', (row) => {
-				console.log("min server = " + row.server);
-				return row.server;
+				rows.push({file:row.file,result:row.result});
 			});
 			query.on('end', () => {
 			  done();
-				res.render('profile.ejs', {conf:req.session.store, user:req.session.user});
+				res.render('profile.ejs', {conf:rows, user:req.session.user});
 			});
 		});
 		
