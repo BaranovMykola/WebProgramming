@@ -30,7 +30,7 @@ app.post('/do', function (req,res)
 										query.on('end', () => {
 										  done();
 										  start(rows,0);
-											res.send('sent');
+										  res.redirect(307, 'http://localhost:4000/profile');
 										});
 									});
 									

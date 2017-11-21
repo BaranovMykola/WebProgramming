@@ -33,9 +33,6 @@ app.get('/load', function(req,res){
 });
 
 app.post('/load', function(req,res){
-//	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+req.body.file+' assets/'+req.body.result+'.jpg', function callback(error, stdout, stderr){
-				
-	//});
 	var taskId;
 	if(!req.session.user)
 	{
@@ -212,6 +209,34 @@ app.get('/profile', function(req,res){
 	}
 });
 
+app.post('/profile', function(req,res){
+	if(req.session.user)
+	{
+		var rows = [];
+		pg.connect(connectionString, (err, client, done) => {
+			if(err) {
+			  done();
+			  console.log(err);
+			  return res.status(500).json({success: false, data: err});
+			}
+			const query = client.query("select * from task where username = '"+req.session.user+"' order by start desc");
+			query.on('row', (row) => {
+				rows.push(row);
+			});
+			query.on('end', () => {
+			  done();
+				res.render('profile.ejs', {conf:rows, user:req.session.user, admin:req.session.admin});
+			});
+		});
+		
+		
+	}
+	else
+	{
+		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user, admin:req.session.admin});
+	}
+});
+
 app.get('/result', function(req,res){
 	if(req.session.user)
 	{
@@ -223,7 +248,7 @@ app.get('/result', function(req,res){
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query("select * from task where id = "+req.query.task);
+			const query = client.query("select * from task where id = "+req.query.task+"order by id");
 			query.on('row', (row) => {
 				if(row.username == req.session.user)
 				{
@@ -434,7 +459,7 @@ app.get('/adminView', function(req,res){
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query("select * from files where task = "+req.query.task);
+			const query = client.query("select * from files where task = "+req.query.task+" order by id");
 			query.on('row', (row) => {
 				rows.push(row);
 			});
@@ -462,7 +487,7 @@ app.get('/performance', function(req,res){
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query("select * from performance");
+			const query = client.query("select * from performance order by server");
 			query.on('row', (row) => {
 				rows.push(row);
 			});
