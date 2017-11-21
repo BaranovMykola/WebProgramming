@@ -63,6 +63,23 @@ function start(inf,i)
 										  done();
 										});
 									});
+									
+											pg.connect(connectionString, (err, client, done) => {
+										if(err) {
+										  done();
+										  console.log(err);
+										  return res.status(500).json({success: false, data: err});
+										}
+										const query = client.query("update performance set threads = threads-1 where server = " + inf[i].server);
+										query.on('row', (row) => {
+											console.log('threads decremented');
+																					
+												
+										});
+										query.on('end', () => {
+										  done();
+										});
+									});
 			
 			if(i+1 < inf.length)
 			{

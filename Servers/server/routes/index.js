@@ -452,5 +452,33 @@ app.get('/adminView', function(req,res){
 	}
 });
 
+app.get('/performance', function(req,res){
+	if(req.session.admin)
+	{
+		var rows = [];
+		pg.connect(connectionString, (err, client, done) => {
+			if(err) {
+			  done();
+			  console.log(err);
+			  return res.status(500).json({success: false, data: err});
+			}
+			const query = client.query("select * from performance");
+			query.on('row', (row) => {
+				rows.push(row);
+			});
+			query.on('end', () => {
+			  done();
+				res.render('performance.ejs', {conf:rows, user:req.session.user, admin:req.session.admin});
+			});
+		});
+		
+		
+	}
+	else
+	{
+		res.render('error.ejs', {err_mess:"Permision denied",user:req.session.user, admin:req.session.admin});
+	}
+});
+
 
 module.exports = app;

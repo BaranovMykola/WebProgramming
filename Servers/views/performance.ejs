@@ -2,8 +2,6 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" href="/assets/index.css">
-
-
 </head>
 <body>
 	<div id = "header">
@@ -19,30 +17,16 @@
 	<div id ="content">
 		<table caption = "Ctalog" class="steelBlueCols">
 			<tr>
-				<th>Task</th>
 				<th>Server</th>
-				<th>User</th>
-				<th>Start</th>
-				<th>Progress</th>
+				<th>Threads</th>
 			</tr>
 			
-			<% for(var i =0;i<conf.length;++i) { console.log(conf[i]); %>
-			
+			<% for(var i =0;i<conf.length;++i) { %>
 			<tr>
-				<td> Task № <%= conf[i].id %> </td>
 				<td> Server № <%= conf[i].server %> </td>
-				<td> <%= conf[i].username %> </td>
-				<td> <%= conf[i].start %> </td>
-				<td> 
-					<a href = <%= "/adminView?task="+conf[i].id %> class = "button">
-						<%= (conf[i].file / conf[i].files * 100).toFixed(2) %> %
-					</a>
-				</td>
+				<td> <%= conf[i].threads %> files on processing</td>
 			</tr>
-			
 			<% } %>
-			<a href = "/performance" class ="button">Monitor servers perofrmance</a>
-			<a href = "/admin" class ="button">Update</a>
 		</table>
 	</div>
 	<div id = "header">
