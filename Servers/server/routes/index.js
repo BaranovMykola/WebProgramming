@@ -23,12 +23,12 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(req,res){
 	req.session.store = [];
-	res.render('index.ejs', {user:req.session.user});
+	res.render('index.ejs', {user:req.session.user, admin:req.session.admin});
 	
 });
 
 app.get('/load', function(req,res){
-	res.render('load.ejs',{user:req.session.user});
+	res.render('load.ejs',{user:req.session.user, admin:req.session.admin});
 	
 });
 
@@ -194,13 +194,13 @@ app.get('/profile', function(req,res){
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query("select * from task where username = '"+req.session.user+"'");
+			const query = client.query("select * from task where username = '"+req.session.user+"' order by start desc");
 			query.on('row', (row) => {
 				rows.push(row);
 			});
 			query.on('end', () => {
 			  done();
-				res.render('profile.ejs', {conf:rows, user:req.session.user});
+				res.render('profile.ejs', {conf:rows, user:req.session.user, admin:req.session.admin});
 			});
 		});
 		
@@ -208,42 +208,67 @@ app.get('/profile', function(req,res){
 	}
 	else
 	{
-		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user});
+		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user, admin:req.session.admin});
 	}
 });
 
 app.get('/result', function(req,res){
 	if(req.session.user)
 	{
-		var rows = [];
-		pg.connect(connectionString, (err, client, done) => {
+		
+		var error = true;
+			pg.connect(connectionString, (err, client, done) => {
 			if(err) {
 			  done();
 			  console.log(err);
 			  return res.status(500).json({success: false, data: err});
 			}
-			const query = client.query("select * from files where task = "+req.query.task);
+			const query = client.query("select * from task where id = "+req.query.task);
 			query.on('row', (row) => {
-				rows.push(row);
+				if(row.username == req.session.user)
+				{
+					error = false;
+				}
 			});
 			query.on('end', () => {
 			  done();
-				res.render('result.ejs', {conf:rows, user:req.session.user});
+				  if(error)
+				  {
+					  res.render('error.ejs', {err_mess:"Permission denied",user:req.session.user, admin:req.session.admin});
+				  }
+				  else
+				  {
+										var rows = [];
+								pg.connect(connectionString, (err, client, done) => {
+									if(err) {
+									  done();
+									  console.log(err);
+									  return res.status(500).json({success: false, data: err});
+									}
+									const query = client.query("select * from files where task = "+req.query.task);
+									query.on('row', (row) => {
+										rows.push(row);
+									});
+									query.on('end', () => {
+									  done();
+										res.render('result.ejs', {conf:rows, user:req.session.user, admin:req.session.admin, admin:req.session.admin});
+									});
+								});
+				  }
 			});
-		});
-		
+			});
 		
 	}
 	else
 	{
-		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user});
+		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user, admin:req.session.admin});
 	}
 });
 
 app.post('/login', function (req, res) {
 	var auth = false;
 	if (!req.body.username || !req.body.password) {
-		res.render('login', {user:req.session.user, message: 'You should fill all fields!'});
+		res.render('login', {user:req.session.user, message: 'You should fill all fields!', admin:req.session.admin});
 	}
 	else 
 	{
@@ -271,7 +296,7 @@ app.post('/login', function (req, res) {
 		  }
 		  else
 		  {
-			  res.render('login', {user:req.session.user, message: 'Authentication failed'});
+			  res.render('login', {user:req.session.user, message: 'Authentication failed', admin:req.session.admin});
 		  }
 		});
 	});	
@@ -285,7 +310,7 @@ app.post('/login', function (req, res) {
 app.get('/login', function(req, res)
 {
 	req.session.destroy();
-	res.render('login.ejs', {user : null, message: null});
+	res.render('login.ejs', {user : null, message: null, admin:false});
 });
  
 // Logout endpoint
@@ -297,7 +322,7 @@ app.get('/logout', function (req, res) {
 app.post('/signup', function (req, res) {
 	var err = false;
 	if (!req.body.username || !req.body.password || !req.body.password_repeat) {
-		res.render('login', {user:req.session.user, message: 'You should fill all fields!'});
+		res.render('login', {user:req.session.user, message: 'You should fill all fields!', admin:req.session.admin});
 	}
 	else 
 	{
@@ -331,14 +356,14 @@ app.post('/signup', function (req, res) {
 					}
 					else
 					{
-						res.render('login', {user:null, message: "Nickname already exists"});
+						res.render('login', {user:null, message: "Nickname already exists", admin:req.session.admin});
 					}
 				});
 			});
 		}
 		else
 		{
-			res.render('login', {user:null, message: "Passwords are not equals"});
+			res.render('login', {user:null, message: "Passwords are not equals", admin:req.session.admin});
 		}
 		
 	
@@ -369,6 +394,62 @@ function createUser(nick, pass, adm)
 app.get('/test1', function(req,res)
 {
 	res.redirect(307, 'http://localhost:5000/do?task=123');
+});
+
+app.get('/admin', function(req,res){
+	if(req.session.admin)
+	{
+		var rows = [];
+		pg.connect(connectionString, (err, client, done) => {
+			if(err) {
+			  done();
+			  console.log(err);
+			  return res.status(500).json({success: false, data: err});
+			}
+			const query = client.query("select * from task order by start desc");
+			query.on('row', (row) => {
+				rows.push(row);
+			});
+			query.on('end', () => {
+			  done();
+				res.render('admin.ejs', {conf:rows, user:req.session.user, admin:req.session.admin});
+			});
+		});
+		
+		
+	}
+	else
+	{
+		res.render('error.ejs', {err_mess:"Permission denied",user:req.session.user, admin:req.session.admin});
+	}
+});
+
+app.get('/adminView', function(req,res){
+	if(req.session.admin)
+	{
+		var rows = [];
+		pg.connect(connectionString, (err, client, done) => {
+			if(err) {
+			  done();
+			  console.log(err);
+			  return res.status(500).json({success: false, data: err});
+			}
+			const query = client.query("select * from files where task = "+req.query.task);
+			query.on('row', (row) => {
+				rows.push(row);
+			});
+			query.on('end', () => {
+			  done();
+				res.render('result.ejs', {conf:rows, user:req.session.user, admin:req.session.admin, admin:req.session.admin});
+			});
+		});
+		
+		
+	}
+	else
+	{
+		res.render('error.ejs', {err_mess:"Permision denied",user:req.session.user, admin:req.session.admin});
+	}
 });
 
 

@@ -11,7 +11,8 @@
 				<a class = "menuItem" href = "/login">
 			<% if(!user) { %> Log in <% } else { %> Log out <% } %>
 		</a>
-		<h1 class = "menuItem"><%= user %></h1>
+		<% if(admin) { %><a href = "/admin" class = "menuItem"><%= user %></a> <% } else 
+		{ %> <h1 class = "menuItem"><%= user %></h1> <% } %>
 	</div>
 	<div id ="content">
 		<div class = "log">

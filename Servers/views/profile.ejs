@@ -11,7 +11,8 @@
 				<a class = "menuItem" href = "/login">
 			<% if(!user) { %> Log in <% } else { %> Log out <% } %>
 		</a>
-		<h1 class = "menuItem"><%= user %></h1>
+		<% if(admin) { %><a href = "/admin" class = "menuItem"><%= user %></a> <% } else 
+		{ %> <h1 class = "menuItem"><%= user %></h1> <% } %>
 	</div>
 	<div id ="content">
 		<table caption = "Ctalog" class="steelBlueCols">
@@ -36,6 +37,7 @@
 			</tr>
 			
 			<% } %>
+			<a href = "/profile" class ="button">Update</a>
 		</table>
 	</div>
 	<div id = "header">
