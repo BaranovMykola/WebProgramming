@@ -43,7 +43,8 @@ function lgg()
 
 function start(inf,i)
 {
-	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+inf[i].file+' '+inf[i].result, 
+	console.log('started program with param assets/'+inf[i].file+' '+inf[i].result);
+	exec('D:/Studying/Programming/Projects/WebProgramming/Servers/assets/LaserTracking.exe assets/'+inf[i].file+' d:/Studying/Programming/Projects/WebProgramming/Servers/assets/'+inf[i].result, 
 		function callback(error, stdout, stderr){
 			console.log(stdout);
 			

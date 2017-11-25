@@ -36,119 +36,128 @@ app.post('/load', function(req,res){
 	var taskId;
 	if(!req.session.user)
 	{
-		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user});
+		res.render('error.ejs', {err_mess:"You must be logged in",user:req.session.user, admin:req.session.admin});
 	}
 	else
 	{
-			
-		
-		pg.connect(connectionString, (err, client, done) => {
-			if(err) {
-			  done();
-			  console.log(err);
-			  return res.status(500).json({success: false, data: err});
-			}
-			const query = client.query('select * from performance order by threads LIMIT 1');
-			query.on('row', (row) => {
+					if(!Array.isArray(req.body.file))
+									{
+										req.body.file = [req.body.file];
+										console.log('handled');
+									}
+									if(req.body.file.length <= 20)
+									{
 				
-				s = row.server
-				
-				console.log('user='+req.session.user);
-				console.log('files='+req.body.file.length);
-				console.log('min='+s);
-				
-				
-			});
-			query.on('end', () => {
-			  done();
-				
-							pg.connect(connectionString, (err, client, done) => {
-						if(err) {
-						  done();
-						  console.log(err);
-						  return res.status(500).json({success: false, data: err});
-						}
-						const query = client.query("insert into task (server,start,username,file,files) values("+s+",CURRENT_TIMESTAMP,'"+req.session.user+"',0,"+req.body.file.length+") returning id");
-						query.on('row', (row) => {
-							
-							console.log("returned id = " + row.id);
-							taskId = row.id;
-							
-							var str = "";
-							if(!Array.isArray(req.body.file))
-							{
-								req.body.file = [req.body.file];
-								console.log('handled');
-							}
-							console.log(req.body.file);
-							for(var i =0;i<req.body.file.length;++i)
-							{
-								str += "('"+req.body.file[i]+"','"+randomstring.generate()+".jpg',"+s+","+row.id+")";
-								if(i+1 != req.body.file.length)
-								{
-									str += ',';
-								}
-							}
-							console.log('inserting //'+str+'//');
-							
-												pg.connect(connectionString, (err, client, done) => {
-										if(err) {
-										  done();
-										  console.log(err);
-										  return res.status(500).json({success: false, data: err});
-										}
-										const query = client.query("insert into files (file, result,server,task) values"+str);
-										query.on('row', (row) => {
-											
-											
-											
-											
-										});
-										query.on('end', () => {
-										  done();
-										  
-										});
-												});
-							
-							
-						});
-						query.on('end', () => {
-						  done();
-						  
-										  pg.connect(connectionString, (err, client, done) => {
-										if(err) {
-										  done();
-										  console.log(err);
-										  return res.status(500).json({success: false, data: err});
-										}
-										const query = client.query("update performance set threads = threads+"+req.body.file.length+" where server = "+s);
-										query.on('row', (row) => {
-											
-											
-											
-											
-										});
-										query.on('end', () => {
-										  done();
-										  if(s == 1)
-										  {
-											  console.log(':5000 port');
-											res.redirect(307, 'http://localhost:5000/do?task='+taskId);
-										  }
-										  else if (s == 2)
-										  {
-											  console.log(':8088 port');
-											  res.redirect(307, 'http://localhost:8088/do?task='+taskId);
-										  }
-									
-										});
-									});
-						  
-						});
+				pg.connect(connectionString, (err, client, done) => {
+					if(err) {
+					  done();
+					  console.log(err);
+					  return res.status(500).json({success: false, data: err});
+					}
+					const query = client.query('select * from performance order by threads LIMIT 1');
+					query.on('row', (row) => {
+						
+						s = row.server
+						
+						console.log('user='+req.session.user);
+						console.log('files='+req.body.file.length);
+						console.log('min='+s);
+						
+						
 					});
-			  
-			});
-		});
+					query.on('end', () => {
+					  done();
+						
+									pg.connect(connectionString, (err, client, done) => {
+								if(err) {
+								  done();
+								  console.log(err);
+								  return res.status(500).json({success: false, data: err});
+								}
+								const query = client.query("insert into task (server,start,username,file,files) values("+s+",CURRENT_TIMESTAMP,'"+req.session.user+"',0,"+req.body.file.length+") returning id");
+								query.on('row', (row) => {
+									
+									console.log("returned id = " + row.id);
+									taskId = row.id;
+									
+									var str = "";
+									
+									console.log(req.body.file);
+									for(var i =0;i<req.body.file.length;++i)
+									{
+										str += "('"+req.body.file[i]+"','"+randomstring.generate()+".jpg',"+s+","+row.id+")";
+										if(i+1 != req.body.file.length)
+										{
+											str += ',';
+										}
+									}
+									console.log('inserting //'+str+'//');
+									
+														pg.connect(connectionString, (err, client, done) => {
+												if(err) {
+												  done();
+												  console.log(err);
+												  return res.status(500).json({success: false, data: err});
+												}
+												const query = client.query("insert into files (file, result,server,task) values"+str);
+												query.on('row', (row) => {
+													
+													
+													
+													
+												});
+												query.on('end', () => {
+												  done();
+												  
+												});
+														});
+									
+									
+								});
+								query.on('end', () => {
+								  done();
+								  
+												  pg.connect(connectionString, (err, client, done) => {
+												if(err) {
+												  done();
+												  console.log(err);
+												  return res.status(500).json({success: false, data: err});
+												}
+												const query = client.query("update performance set threads = threads+"+req.body.file.length+" where server = "+s);
+												query.on('row', (row) => {
+													
+													
+													
+													
+												});
+												query.on('end', () => {
+												  done();
+												  if(s == 1)
+												  {
+													  console.log(':5000 port');
+													res.redirect(307, 'http://localhost:5000/do?task='+taskId);
+												  }
+												  else if (s == 2)
+												  {
+													  console.log(':8088 port');
+													  res.redirect(307, 'http://localhost:8088/do?task='+taskId);
+												  }
+											
+												});
+											});
+								  
+								});
+							});
+					  
+					});
+				});
+				
+				}
+				else
+				{
+					res.render('error.ejs', {err_mess:"Limit reached. Use less than 20 files",user:req.session.user, admin:req.session.admin});
+				}
+				
 		
 									
 
